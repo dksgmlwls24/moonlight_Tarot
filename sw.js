@@ -1,5 +1,5 @@
-const CACHE = "moonlight-tarot-v3";
-const ASSETS = ["./", "./index.html", "./manifest.json", "./icon.svg", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
+const CACHE = "moonlight-tarot-v4";
+const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-v2.svg", "./icon-192-v2.png", "./icon-512-v2.png", "./apple-touch-icon-v2.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
