@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#120d22">
+<title>달빛 타로</title>
+<style>
+:root{--bg:#0b0814;--panel:#171126;--text:#f7f1ff;--muted:#bdb0cf;--gold:#e3c889;--violet:#9c7ae6}
+*{box-sizing:border-box} body{margin:0;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR","Apple SD Gothic Neo",sans-serif;color:var(--text);background:radial-gradient(circle at 50% -10%,#45306b 0,#171027 36%,var(--bg) 72%);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+main{width:min(92vw,720px);margin:auto;padding:36px 0 60px}.brand{text-align:center;color:#d9c5ff;letter-spacing:.28em;font-size:12px}.moon{text-align:center;font-size:46px;margin-top:10px}h1{text-align:center;margin:4px 0 6px;font-size:34px}.sub{text-align:center;color:var(--muted);margin:0 0 28px}
+.panel,.result{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:24px;padding:20px;box-shadow:0 16px 50px rgba(0,0,0,.25);backdrop-filter:blur(12px)}
+label,.label{display:block;font-weight:750;margin:0 0 10px}textarea{width:100%;min-height:108px;border-radius:16px;border:1px solid #514665;background:#110d1d;color:white;padding:14px;font:inherit;resize:none;outline:none}textarea:focus{border-color:#b89bff}
+.group{margin-top:22px}.choices{display:flex;flex-wrap:wrap;gap:8px}.choice{border:1px solid #504663;background:#181322;color:#d9d0e6;border-radius:999px;padding:10px 13px;font:inherit}.choice.active{background:#8461d2;border-color:#bda2ff;color:white}
+.primary,.secondary{width:100%;border:0;border-radius:16px;padding:16px;font:inherit;font-weight:800;cursor:pointer}.primary{margin-top:26px;background:linear-gradient(135deg,#e4cb91,#b58bdf);color:#17101f}.secondary{margin-top:18px;background:transparent;border:1px solid #655778;color:white}
+#reading{display:none}.q{text-align:center;color:#ddd0ef;line-height:1.5;margin:14px 0 22px}.hint{text-align:center;color:var(--muted);margin-bottom:20px}.cards{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}.wrap{perspective:1000px}.card{width:126px;height:210px;position:relative;transform-style:preserve-3d;transition:.65s;cursor:pointer}.card.flipped{transform:rotateY(180deg)}.face{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;border:1.5px solid #c8a9ff;overflow:hidden}.back{display:grid;place-items:center;background:radial-gradient(circle,#4d3674,#171024);font-size:46px;box-shadow:0 0 28px rgba(169,127,255,.2)}.front{transform:rotateY(180deg);background:linear-gradient(155deg,#f4ecff,#cfbdea);color:#21172e;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;text-align:center}.num{font-size:11px;opacity:.65}.symbol{font-size:46px;margin:12px}.name{font-weight:900}.dir{font-size:12px;margin-top:7px}
+#results{display:none;margin-top:28px}.result{margin-bottom:10px}.pos{font-size:12px;color:#c8a9ff}.title{font-size:19px;font-weight:900;margin:6px 0}.keyword{color:#e5d8f2;margin-bottom:8px}.text{color:#cfc4da;line-height:1.65}.advice{border-color:#705a91;background:linear-gradient(135deg,rgba(143,102,213,.18),rgba(255,255,255,.05))}
+.deck-stage{position:relative;min-height:300px;margin:6px -4px 8px;overflow:hidden}.deck{position:relative;height:270px;display:flex;align-items:center;justify-content:center}.pick-card{position:absolute;width:92px;height:154px;border-radius:14px;border:1.5px solid #c8a9ff;background:radial-gradient(circle at 50% 35%,#4d3674,#171024 68%);box-shadow:0 12px 28px rgba(0,0,0,.34),0 0 18px rgba(169,127,255,.12);display:grid;place-items:center;font-size:31px;color:#eadcff;cursor:pointer;transition:transform .42s cubic-bezier(.2,.8,.2,1),filter .25s;transform-origin:50% 130%}.pick-card::before{content:"";position:absolute;inset:8px;border:1px solid rgba(227,200,137,.45);border-radius:10px}.pick-card.chosen{filter:brightness(1.35);box-shadow:0 16px 35px rgba(0,0,0,.42),0 0 26px rgba(227,200,137,.42)}.pick-card.disabled{pointer-events:none}.shuffle-note{text-align:center;color:#d8c9ec;margin-top:-10px;font-size:14px}@keyframes shuffleLeft{0%,100%{transform:translate(0,0)}25%{transform:translate(-82px,-12px) rotate(-8deg)}50%{transform:translate(70px,8px) rotate(7deg)}75%{transform:translate(-38px,4px) rotate(-4deg)}}@keyframes shuffleRight{0%,100%{transform:translate(0,0)}25%{transform:translate(78px,8px) rotate(8deg)}50%{transform:translate(-72px,-10px) rotate(-7deg)}75%{transform:translate(42px,2px) rotate(5deg)}}.pick-card.shuffling:nth-child(odd){animation:shuffleLeft .55s ease-in-out 2}.pick-card.shuffling:nth-child(even){animation:shuffleRight .55s ease-in-out 2}
+
+
+
+.today-card-box{margin:0 0 18px;padding:20px;border-radius:22px;border:1px solid rgba(227,200,137,.35);background:linear-gradient(145deg,rgba(227,200,137,.10),rgba(156,122,230,.10));text-align:center}
+.today-card-box .today-icon{font-size:34px;margin-bottom:5px}
+.today-card-box h2{margin:4px 0 7px;font-size:22px}
+.today-card-box p{margin:0;color:var(--muted);font-size:14px;line-height:1.55}
+.today-card-box .primary{margin-top:16px}
+.today-badge{display:inline-block;margin-bottom:7px;padding:5px 9px;border-radius:999px;background:rgba(227,200,137,.14);color:#ead39f;font-size:11px;letter-spacing:.08em}
+
+
+.history-entry{margin-bottom:12px;padding:16px;border-radius:18px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.10)}
+.history-date{font-size:12px;color:#bca9d4;margin-bottom:6px}.history-question{font-weight:800;margin-bottom:8px;line-height:1.45}.history-cards{display:flex;gap:8px;overflow-x:auto;padding-bottom:3px}.history-mini{min-width:92px;text-align:center;font-size:11px;color:#ddd0e8}.history-mini img{width:76px;height:126px;object-fit:cover;border-radius:8px;border:1px solid rgba(227,200,137,.45);display:block;margin:0 auto 5px}.history-empty{text-align:center;color:var(--muted);padding:36px 10px;line-height:1.7}.nav{pointer-events:auto;position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(92vw,680px);display:flex;z-index:9999;padding:7px;border-radius:18px;background:rgba(18,13,34,.94);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(14px);box-shadow:0 10px 35px rgba(0,0,0,.35)}.nav button{flex:1;border:0;background:transparent;color:#c8bdd5;padding:9px 5px;border-radius:12px;font:inherit;font-size:12px}.nav button.active{background:rgba(156,122,230,.22);color:#fff}.clear-btn{margin-top:14px;width:100%;padding:12px;border-radius:14px;border:1px solid #665877;background:transparent;color:#d8cfdf}.saved-today{margin-top:10px;font-size:13px;color:#e6cf98}
+body{padding-bottom:88px}
+
+
+.front{padding:14px!important;background:linear-gradient(155deg,#f4ecff,#cfbdea)!important;color:#21172e!important;display:flex!important;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.emoji-art{font-size:50px;line-height:1;margin:12px 0}
+.result-emoji{width:76px;height:112px;border-radius:10px;border:1px solid rgba(227,200,137,.55);float:left;margin:0 14px 8px 0;display:flex;align-items:center;justify-content:center;font-size:38px;background:linear-gradient(155deg,#efe6ff,#cbb8ea)}
+.result::after{content:"";display:block;clear:both}
+
+
+.history-emoji-card{width:76px;height:112px;border-radius:10px;border:1px solid rgba(227,200,137,.55);margin:0 auto 5px;display:flex;align-items:center;justify-content:center;font-size:38px;background:linear-gradient(155deg,#efe6ff,#cbb8ea);overflow:hidden}
+.history-emoji-symbol{display:inline-block;line-height:1}
+
+
+.history-card-detail{display:flex;gap:13px;align-items:flex-start;padding:12px 0;border-top:1px solid rgba(255,255,255,.08)}
+.history-card-detail:first-child{border-top:0;padding-top:4px}
+.history-card-visual{flex:0 0 76px;text-align:center;font-size:11px;color:#ddd0e8}
+.history-card-copy{flex:1;min-width:0}
+.history-card-name{font-weight:900;font-size:15px;margin-bottom:4px}
+.history-card-keyword{font-size:13px;color:#e4d2a5;margin-bottom:5px;line-height:1.45}
+.history-card-text{font-size:13px;color:#cfc4da;line-height:1.6}
+.history-cards{display:block!important;overflow:visible!important}
+
+@media(max-width:390px){main{width:94vw}.card{width:105px;height:176px}.symbol{font-size:38px;margin:9px}h1{font-size:30px}}
+</style>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#120d22">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="달빛 타로">
+
+</head>
+<body>
+<main>
+<section id="home">
+<div class="brand">MOONLIGHT TAROT</div><div class="moon">🌙</div><h1>달빛 타로</h1>
+<p class="sub">마음속 질문을 떠올리고 카드를 선택하세요.</p>
+<div class="today-card-box">
+<div class="today-badge">DAILY CARD</div>
+<div class="today-icon">🌙</div>
+<h2>오늘의 카드</h2>
+<p>질문 없이, 오늘 나에게 필요한 메시지를 한 장 뽑아보세요.</p>
+<button class="primary" id="todayStart">오늘의 카드 뽑기 ✦</button>
+</div>
+<div class="panel">
+<label for="question">무엇이 궁금한가요?</label>
+<textarea id="question" placeholder="예) 그 사람과 앞으로 관계가 어떻게 흘러갈까요?"></textarea>
+<div class="group"><span class="label">질문 분야</span><div class="choices" id="cats">
+<button class="choice active" data-v="연애">💕 연애</button><button class="choice" data-v="직장·학업">💼 직장·학업</button><button class="choice" data-v="금전">💰 금전</button><button class="choice" data-v="인간관계">🤝 인간관계</button><button class="choice" data-v="종합">🌙 종합</button>
+</div></div>
+<div class="group"><span class="label">카드 배열</span><div class="choices" id="spreads">
+<button class="choice active" data-v="1">🔮 한 장 리딩</button><button class="choice" data-v="3">✨ 세 장 리딩</button>
+</div></div>
+<button class="primary" id="start">카드 섞기 ✦</button>
+</div>
+</section>
+
+<section id="reading">
+<div class="brand">MOONLIGHT TAROT</div><div class="moon">✦</div><h1>카드를 선택하세요</h1>
+<div class="q" id="qview"></div><div class="hint">마음이 가는 카드를 눌러 확인하세요</div>
+<div class="deck-stage" id="deckStage"><div class="deck" id="deck"></div><div class="shuffle-note" id="pickNote">카드를 섞는 중이에요…</div></div><div class="cards" id="cards" style="display:none"></div><div id="results"></div>
+</section>
+
+<section id="history" style="display:none">
+<div class="brand">MOONLIGHT TAROT</div><div class="moon">📖</div><h1>타로 기록</h1>
+<p class="sub">이 기기에 저장된 나의 리딩을 모아봐요.</p>
+<div id="historyList"></div>
+<button type="button" class="clear-btn" id="clearHistory">기록 전체 삭제</button>
+</section>
+
+</main>
+<script>
+const tarot=[
+["0","바보","🌄","새로운 시작 · 자유 · 가능성","충동 · 준비 부족 · 망설임","새로운 흐름이 시작될 가능성을 나타냅니다. 결과를 지나치게 계산하기보다 새로운 경험을 받아들이는 것이 중요한 시기입니다.","성급한 선택이나 준비되지 않은 행동을 조심할 필요가 있습니다. 한 번 더 상황을 확인해보세요.","cards/00.jpg"],
+["I","마법사","✨","능력 · 시작 · 실행력","자신감 부족 · 계획만 있음","필요한 능력과 자원이 이미 갖춰져 있음을 의미합니다. 생각을 실제 행동으로 옮길 때입니다.","가능성은 있지만 제대로 활용하지 못하고 있을 수 있습니다. 계획보다 실행이 필요한 시기입니다.","cards/01.jpg"],
+["II","여사제","🌙","직감 · 비밀 · 내면","혼란 · 직감 무시","겉으로 드러난 정보보다 직감과 내면의 목소리가 중요한 상황입니다.","불안이나 선입견 때문에 본질을 놓칠 수 있습니다. 감정과 사실을 구분해보세요.","cards/02.jpg"],
+["III","여황제","🌹","풍요 · 사랑 · 성장","과잉 · 의존 · 정체","관계나 일이 자연스럽게 성장할 가능성을 보여줍니다. 여유를 가지고 흐름을 지켜보세요.","지나친 기대나 의존이 오히려 흐름을 막을 수 있습니다.","cards/03.jpg"],
+["IV","황제","👑","안정 · 질서 · 책임","통제 · 완고함","안정적인 기반과 책임감이 필요한 상황입니다. 명확한 기준을 세우는 것이 도움이 됩니다.","지나친 통제나 고집 때문에 관계나 상황이 경직될 수 있습니다.","cards/04.jpg"],
+["V","교황","🔑","조언 · 전통 · 신뢰","관습 탈피 · 다른 길","검증된 방식이나 경험자의 조언이 도움이 될 수 있습니다.","기존 방식이 반드시 정답은 아닐 수 있습니다. 자신만의 기준을 찾아보세요.","cards/05.jpg"],
+["VI","연인","💕","사랑 · 선택 · 조화","갈등 · 불균형","중요한 관계 또는 선택의 순간을 의미합니다. 서로의 가치관을 확인하는 것이 중요합니다.","마음과 현실 사이에서 갈등하거나 관계의 균형이 흔들릴 수 있습니다.","cards/06.jpg"],
+["VII","전차","🏇","전진 · 승리 · 의지","방향 상실 · 무리함","강한 추진력으로 상황을 앞으로 움직일 수 있습니다.","속도보다 방향을 확인해야 합니다. 무리하게 밀어붙이지 않는 것이 좋습니다.","cards/07.jpg"],
+["VIII","힘","🦁","용기 · 인내 · 자신감","불안 · 자신감 저하","강하게 밀어붙이는 것보다 침착함과 인내가 더 큰 힘이 되는 시기입니다.","스스로의 능력을 과소평가하고 있을 수 있습니다.","cards/08.jpg"],
+["IX","은둔자","🏮","성찰 · 탐색 · 휴식","고립 · 지나친 고민","잠시 외부의 소음에서 벗어나 자신의 생각을 정리할 필요가 있습니다.","생각이 너무 많아 행동하지 못하고 있을 가능성이 있습니다.","cards/09.jpg"],
+["X","운명의 수레바퀴","🎡","변화 · 기회 · 전환점","지연 · 반복","예상하지 못했던 변화가 새로운 기회가 될 수 있습니다.","비슷한 문제가 반복되고 있다면 기존 방식에서 벗어날 필요가 있습니다.","cards/10.jpg"],
+["XI","정의","⚖️","균형 · 판단 · 결과","불균형 · 편견","감정보다는 사실과 균형 잡힌 판단이 중요합니다.","한쪽의 입장만 보고 판단하고 있지는 않은지 살펴보세요.","cards/11.jpg"],
+["XII","매달린 사람","🪢","기다림 · 관점 변화","정체 · 희생","지금 당장 움직이기보다 다른 관점에서 상황을 바라볼 필요가 있습니다.","필요 이상으로 기다리거나 희생하고 있을 수 있습니다.","cards/12.jpg"],
+["XIII","죽음","🦋","종료 · 변화 · 재시작","변화 거부 · 미련","무언가가 끝나면서 새로운 단계가 시작되는 강한 변화의 카드입니다.","이미 끝난 흐름을 붙잡고 있어 새로운 시작이 늦어질 수 있습니다.","cards/13.jpg"],
+["XIV","절제","💧","균형 · 조율 · 안정","과도함 · 불균형","급하게 결론을 내리기보다 상황을 천천히 조율하는 것이 좋습니다.","감정이나 행동이 한쪽으로 치우치지 않았는지 확인해보세요.","cards/14.jpg"],
+["XV","악마","⛓️","집착 · 욕망 · 유혹","해방 · 집착에서 벗어남","강한 욕망이나 집착이 판단에 영향을 주고 있을 가능성이 있습니다.","스스로를 묶고 있던 생각이나 관계에서 벗어날 기회가 생길 수 있습니다.","cards/15.jpg"],
+["XVI","탑","⚡","급변 · 충격 · 깨달음","변화 회피 · 불안","기존의 생각이나 상황이 예상치 못하게 바뀔 수 있습니다.","필요한 변화를 미루면서 불안이 커지고 있을 가능성이 있습니다.","cards/16.jpg"],
+["XVII","별","⭐","희망 · 회복 · 가능성","실망 · 자신감 저하","힘든 상황 이후 다시 희망과 가능성이 보이기 시작합니다.","가능성이 있음에도 스스로 기대를 낮추고 있을 수 있습니다.","cards/17.jpg"],
+["XVIII","달","🌕","불확실 · 감정 · 직감","진실 발견 · 혼란 해소","아직 모든 정보가 드러난 상황은 아닙니다. 섣부른 판단을 피하세요.","혼란스럽던 상황이 조금씩 명확해질 가능성이 있습니다.","cards/18.jpg"],
+["XIX","태양","☀️","성공 · 기쁨 · 명확함","지연된 성공 · 과도한 기대","긍정적인 흐름과 명확한 결과를 의미합니다.","좋은 가능성은 있지만 기대한 속도보다 조금 늦을 수 있습니다.","cards/19.jpg"],
+["XX","심판","📯","결정 · 깨달음 · 재도전","결정 회피 · 후회","중요한 결정을 내리고 다음 단계로 넘어갈 시점입니다.","과거에 대한 후회 때문에 결정을 미루고 있을 수 있습니다.","cards/20.jpg"],
+["XXI","세계","🌍","완성 · 성취 · 새로운 단계","미완성 · 마무리 필요","하나의 과정이 성공적으로 마무리되고 새로운 단계로 이동하는 흐름입니다.","거의 완성됐지만 아직 해결해야 할 작은 부분이 남아 있습니다.","cards/21.jpg"]
+];
+let category="연애",spread=1,selected=[],readingMode="question";
+function bind(group,cb){document.querySelectorAll(group+" .choice").forEach(b=>b.onclick=()=>{document.querySelectorAll(group+" .choice").forEach(x=>x.classList.remove("active"));b.classList.add("active");cb(b.dataset.v)})}
+bind("#cats",v=>category=v); bind("#spreads",v=>spread=+v);
+document.getElementById("start").onclick=()=>{
+ readingMode="question";
+ spread=parseInt(document.querySelector("#spreads .choice.active")?.dataset.v || "1");
+ category=document.querySelector("#cats .choice.active")?.dataset.v || "연애";
+ selected=[];
+ document.getElementById("deckStage").style.display="block";
+ document.getElementById("cards").style.display="none";
+ document.getElementById("cards").innerHTML="";
+ document.getElementById("results").style.display="none";
+ document.getElementById("results").innerHTML="";
+ document.querySelector("#reading h1").textContent="카드를 선택하세요";
+ document.querySelector(".hint").textContent="마음이 가는 카드를 눌러 확인하세요";
+ const q=document.getElementById("question").value.trim();if(!q){alert("먼저 궁금한 질문을 적어주세요 🌙");return}
+ document.getElementById("home").style.display="none";document.getElementById("reading").style.display="block";
+ document.getElementById("qview").innerHTML="“"+q+"”<br><small>"+category+" 리딩 · "+(spread===1?"1장":"3장")+" 선택</small>";
+ createDeck();
+};
+
+document.getElementById("todayStart").onclick=()=>{
+ readingMode="today";
+ spread=1;
+ category="오늘";
+ selected=[];
+ document.getElementById("deckStage").style.display="block";
+ document.getElementById("cards").style.display="none";
+ document.getElementById("cards").innerHTML="";
+ document.getElementById("results").style.display="none";
+ document.getElementById("results").innerHTML="";
+ try{
+   const saved=JSON.parse(localStorage.getItem(TODAY_KEY)||"null");
+   if(saved&&saved.day===localDateKey()&&saved.item&&saved.item.cards&&saved.item.cards.length){
+     const cdata=saved.item.cards[0];
+     const card=tarot.find(c=>c[1]===cdata.name);
+     if(card){
+       selected=[{c:card,rev:!!cdata.reverse}];
+       document.getElementById("home").style.display="none";
+       document.getElementById("reading").style.display="block";
+       document.getElementById("qview").innerHTML="🌙 <b>오늘의 카드</b><br><small>오늘 이미 뽑은 카드를 다시 보여드릴게요.</small>";
+       document.querySelector("#reading h1").textContent="오늘의 카드";
+       document.getElementById("deckStage").style.display="none";
+       const cards=document.getElementById("cards");cards.style.display="flex";cards.innerHTML=`<div class="wrap"><div class="card flipped"><div class="face back">✦</div><div class="face front"><div class="num">${card[0]}</div><div class="emoji-art" style="${cdata.reverse?"transform:rotate(180deg)":""}">${card[2]}</div><div class="name">${card[1]}</div><div class="dir">${cdata.reverse?"역방향 ↓":"정방향 ↑"}</div></div></div></div>`;
+       showResults(true);return;
+     }
+   }
+ }catch(e){}
+ document.getElementById("home").style.display="none";
+ document.getElementById("reading").style.display="block";
+ document.getElementById("qview").innerHTML="🌙 <b>오늘의 카드</b><br><small>오늘 나에게 필요한 메시지를 골라보세요.</small>";
+ document.querySelector("#reading h1").textContent="오늘의 카드를 선택하세요";
+ document.querySelector(".hint").textContent="질문은 필요 없어요. 마음이 가는 카드 한 장을 골라주세요 ✦";
+ createDeck();
+};
+
+function createDeck(){
+ const deck=document.getElementById("deck"),note=document.getElementById("pickNote");selected=[];deck.innerHTML="";
+ for(let i=0;i<18;i++){const d=document.createElement("button");d.type="button";d.className="pick-card shuffling";d.innerHTML="✦";d.style.zIndex=i+1;deck.appendChild(d)}
+ note.textContent="카드를 섞는 중이에요…";
+ setTimeout(()=>{const cs=[...deck.children];cs.forEach((d,i)=>{const off=i-(cs.length-1)/2;d.classList.remove("shuffling");d.style.transform=`translate(${off*15}px, ${Math.abs(off)*1.15}px) rotate(${off*2.2}deg)`;d.onclick=()=>pickFromDeck(d)});note.textContent=readingMode==="today"?"오늘 마음이 가는 카드 한 장을 골라주세요 ✦":(spread===1?"마음이 가는 카드 1장을 골라주세요 ✦":"마음이 가는 카드 3장을 골라주세요 ✦")},1250);
+}
+function pickFromDeck(el){
+ if(el.classList.contains("chosen")||selected.length>=spread)return;
+ const pool=tarot.filter(c=>!selected.some(o=>o.c[1]===c[1])),c=pool[Math.floor(Math.random()*pool.length)];
+ selected.push({c,rev:Math.random()<.35});el.classList.add("chosen");el.style.transform+=" translateY(-28px)";
+ document.getElementById("pickNote").textContent=`${selected.length} / ${spread}장 선택했어요`;
+ if(selected.length===spread){document.querySelectorAll(".pick-card").forEach(x=>x.classList.add("disabled"));setTimeout(revealPickedCards,650)}
+}
+function revealPickedCards(){
+ document.getElementById("deckStage").style.display="none";const cards=document.getElementById("cards");cards.style.display="flex";cards.innerHTML="";let opened=0;
+ selected.forEach(o=>{let d=document.createElement("div");d.className="wrap";d.innerHTML=`<div class="card"><div class="face back">✦</div><div class="face front"><div class="num">${o.c[0]}</div><div class="emoji-art" style="${o.rev?"transform:rotate(180deg)":""}">${o.c[2]}</div><div class="name">${o.c[1]}</div><div class="dir">${o.rev?"역방향 ↓":"정방향 ↑"}</div></div></div>`;let card=d.firstChild;card.onclick=()=>{if(card.classList.contains("flipped"))return;card.classList.add("flipped");if(++opened===selected.length)setTimeout(showResults,700)};cards.appendChild(d)});
+ document.querySelector(".hint").textContent="선택한 카드를 눌러 한 장씩 확인하세요 ✦";
+}
+function showResults(restored=false){
+ if(!restored) saveCurrentReading();
+ const r=document.getElementById("results"),pos=readingMode==="today"?["오늘의 카드"]:spread===3?["과거","현재","미래"]:["현재의 메시지"];
+ r.style.display="block";r.innerHTML="<h2>🌙 카드의 메시지</h2>"+selected.map((o,i)=>`<div class="result"><div class="result-emoji"><span style="display:inline-block;${o.rev?"transform:rotate(180deg)":""}">${o.c[2]}</span></div><div class="pos">${pos[i]}</div><div class="title">${o.c[1]} ${o.rev?"↓":"↑"}</div><div class="keyword">${o.rev?o.c[4]:o.c[3]}</div><div class="text">${o.rev?o.c[6]:o.c[5]}</div></div>`).join("")+`<div class="result advice"><div class="title">${readingMode==="today"?"🌙 오늘의 메시지":"✨ 이번 리딩의 조언"}</div><div class="text">${readingMode==="today"?"오늘 뽑은 카드의 의미를 하루의 작은 힌트로 활용해보세요. 카드가 미래를 확정하는 것은 아니지만, 오늘 어떤 마음가짐과 행동에 주의를 기울일지 돌아보는 계기가 될 수 있어요.":"카드는 미래를 확정하는 답이라기보다 현재 상황을 다른 관점에서 바라보도록 돕는 상징입니다. 이번 카드에서 마음에 남는 키워드를 현재 고민과 연결해 천천히 생각해보세요."}</div></div><button class="secondary" onclick="location.reload()">${readingMode==="today"?"홈으로 돌아가기":"다시 타로 보기"}</button>`;
+ r.scrollIntoView({behavior:"smooth"});
+}
+</script>
+
+
+<script>
+const HISTORY_KEY="moonlightTarotHistoryV1";
+const TODAY_KEY="moonlightTarotTodayV1";
+function getHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]")}catch(e){return[]}}
+function saveHistoryItem(item){
+ const h=getHistory();h.unshift(item);localStorage.setItem(HISTORY_KEY,JSON.stringify(h.slice(0,100)));
+}
+function localDateKey(d=new Date()){
+ const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");
+ return `${y}-${m}-${day}`;
+}
+function saveCurrentReading(){
+ if(!selected||!selected.length)return;
+ const item={
+   id:Date.now(),date:new Date().toLocaleString("ko-KR"),
+   mode:readingMode,category,
+   question:readingMode==="today"?"오늘의 카드":document.getElementById("question").value.trim(),
+   cards:selected.map(o=>({number:o.c[0],name:o.c[1],symbol:o.c[2],reverse:o.rev,keyword:o.rev?o.c[4]:o.c[3],text:o.rev?o.c[6]:o.c[5]}))
+ };
+ saveHistoryItem(item);
+ if(readingMode==="today") localStorage.setItem(TODAY_KEY,JSON.stringify({day:localDateKey(),item}));
+}
+function renderHistory(){
+ const list=document.getElementById("historyList"),h=getHistory();
+ if(!h.length){list.innerHTML='<div class="panel history-empty">아직 저장된 타로가 없어요.<br>카드를 뽑으면 여기에 자동으로 기록됩니다. 🌙</div>';return}
+ list.innerHTML=h.map(x=>`<div class="history-entry"><div class="history-date">${x.date} · ${x.mode==="today"?"오늘의 카드":x.category}</div><div class="history-question">${escapeHtml(x.question||"")}</div><div class="history-cards">${x.cards.map(c=>`<div class="history-card-detail"><div class="history-card-visual"><div class="history-emoji-card"><span class="history-emoji-symbol" style="${c.reverse?"transform:rotate(180deg)":""}">${c.symbol||"🔮"}</span></div><b>${c.name}</b><br>${c.reverse?"역방향 ↓":"정방향 ↑"}</div><div class="history-card-copy"><div class="history-card-name">${c.name} ${c.reverse?"↓":"↑"}</div><div class="history-card-keyword">${escapeHtml(c.keyword||"")}</div><div class="history-card-text">${escapeHtml(c.text||"")}</div></div></div>`).join("")}</div></div>`).join("");
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function showHome(){
+ document.getElementById("home").style.display="block";document.getElementById("reading").style.display="none";document.getElementById("history").style.display="none";
+ document.getElementById("results").style.display="none";document.getElementById("results").innerHTML="";
+ document.getElementById("cards").innerHTML="";document.getElementById("cards").style.display="none";
+ document.getElementById("deckStage").style.display="block";
+ document.getElementById("navHome").classList.add("active");document.getElementById("navHistory").classList.remove("active");window.scrollTo(0,0);
+}
+function showHistory(){
+ document.getElementById("home").style.display="none";document.getElementById("reading").style.display="none";document.getElementById("history").style.display="block";
+ document.getElementById("navHome").classList.remove("active");document.getElementById("navHistory").classList.add("active");renderHistory();window.scrollTo(0,0);
+}
+document.getElementById("navHome").onclick=showHome;
+document.getElementById("navHistory").onclick=showHistory;
+function clearAllTarotData(){
+ const history=getHistory();
+ const savedToday=localStorage.getItem(TODAY_KEY);
+ if(history.length===0 && !savedToday){
+   alert("저장된 타로 기록이 없습니다. 🌙");
+   return;
+ }
+ if(!confirm("저장된 타로 기록을 모두 삭제할까요?\n오늘의 카드도 초기화되어 다시 뽑을 수 있어요.")) return;
+ localStorage.removeItem(HISTORY_KEY);
+ localStorage.removeItem(TODAY_KEY);
+ selected=[];
+ renderHistory();
+ alert("타로 기록이 모두 삭제되었습니다. 🌙");
+}
+/* 기록 삭제는 하단의 delegated click handler에서 처리 */
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));
+}
+</script>
+
+<nav class="nav">
+<button id="navHome" class="active">🏠<br>홈</button>
+<button id="navHistory">📖<br>기록</button>
+</nav>
+
+
+<script>
+document.addEventListener("click", function(e){
+  const h=e.target.closest("#navHistory");
+  const home=e.target.closest("#navHome");
+  const clear=e.target.closest("#clearHistory");
+  if(clear){ e.preventDefault(); e.stopPropagation(); if(typeof clearAllTarotData==="function") clearAllTarotData(); return; }
+  if(h){ e.preventDefault(); e.stopPropagation(); if(typeof showHistory==="function") showHistory(); }
+  if(home){ e.preventDefault(); e.stopPropagation(); if(typeof showHome==="function") showHome(); }
+});
+</script>
+
+</body>
+</html>
