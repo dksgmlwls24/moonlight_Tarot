@@ -1,4 +1,4 @@
-const CACHE = "moonlight-tarot-v2";
+const CACHE = "moonlight-tarot-v3";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon.svg", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", e => {

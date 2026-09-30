@@ -45,12 +45,23 @@ label,.label{display:block;font-weight:750;margin:0 0 10px}textarea{width:100%;m
 .history-card-text{font-size:13px;color:#cfc4da;line-height:1.6}
 .history-card-text+.history-card-text{margin-top:5px;color:#e9dcc0}
 .nav{position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(92vw,680px);display:flex;z-index:9999;padding:7px;border-radius:18px;background:rgba(18,13,34,.94);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(14px);box-shadow:0 10px 35px rgba(0,0,0,.35)}.nav button{flex:1;border:0;background:transparent;color:#c8bdd5;padding:9px 5px;border-radius:12px;font:inherit;font-size:12px}.nav button.active{background:rgba(156,122,230,.22);color:#fff}.clear-btn{margin-top:14px;width:100%;padding:12px;border-radius:14px;border:1px solid #665877;background:transparent;color:#d8cfdf}
+[hidden]{display:none!important}
+#home{position:relative}
+.install-btn{position:absolute;top:-22px;right:0;display:flex;align-items:center;gap:5px;padding:8px 13px;border-radius:999px;border:1px solid rgba(227,200,137,.5);background:rgba(227,200,137,.12);color:#ead39f;font:inherit;font-size:13px;font-weight:800;cursor:pointer;backdrop-filter:blur(8px)}
+.install-btn:active{transform:scale(.96)}
+.modal{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(5,3,12,.7);backdrop-filter:blur(4px)}
+.modal-box{width:min(100%,380px);padding:24px 20px 20px;border-radius:22px;background:#171126;border:1px solid rgba(227,200,137,.35);box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center}
+.modal-box img{width:72px;height:72px;border-radius:16px}
+.modal-box h2{margin:12px 0 10px;font-size:20px}
+.modal-box ol{text-align:left;margin:0;padding-left:22px;color:#d8cfdf;line-height:1.75;font-size:14px}
+.modal-box .primary{margin-top:20px}
 @media(max-width:390px){main{width:94vw}.card{width:105px;height:176px}.emoji-art{font-size:40px;margin:9px 0}h1{font-size:30px}}
 </style>
 </head>
 <body>
 <main>
 <section id="home">
+<button type="button" class="install-btn" id="installBtn" hidden>📲 앱 설치</button>
 <div class="brand">MOONLIGHT TAROT</div><div class="moon">🌙</div><h1>달빛 타로</h1>
 <p class="sub">마음속 질문을 떠올리고 카드를 선택하세요.</p>
 <div class="today-card-box">
@@ -96,6 +107,15 @@ label,.label{display:block;font-weight:750;margin:0 0 10px}textarea{width:100%;m
 </div>
 </section>
 </main>
+
+<div class="modal" id="installGuide" hidden>
+<div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="installTitle">
+<img src="icon-192.png" alt="">
+<h2 id="installTitle">달빛 타로 앱 설치</h2>
+<ol id="installSteps"></ol>
+<button type="button" class="primary" id="installClose">확인</button>
+</div>
+</div>
 
 <nav class="nav" id="nav">
 <button id="navHome" class="active">🏠<br>홈</button>
@@ -405,6 +425,28 @@ $("deleteConfirm").onclick=()=>{
  }catch(e){}
  showHistory();
 };
+
+let installPrompt=null;
+const isStandalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+$("installBtn").hidden=isStandalone;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installPrompt=e});
+window.addEventListener("appinstalled",()=>{installPrompt=null;$("installBtn").hidden=true});
+$("installBtn").onclick=async()=>{
+ if(installPrompt){
+  installPrompt.prompt();
+  const {outcome}=await installPrompt.userChoice;
+  installPrompt=null;
+  if(outcome==="accepted")$("installBtn").hidden=true;
+  return;
+ }
+ $("installSteps").innerHTML=isIOS
+  ?"<li><b>Safari</b>로 이 페이지를 열어주세요.</li><li>하단의 <b>공유 버튼</b>(□↑)을 누르세요.</li><li><b>‘홈 화면에 추가’</b>를 선택하세요.</li>"
+  :"<li>브라우저 메뉴(<b>⋮</b>)를 여세요.</li><li><b>‘앱 설치’</b> 또는 <b>‘홈 화면에 추가’</b>를 선택하세요.</li><li>이미 설치했다면 홈 화면의 <b>달빛 타로</b> 아이콘으로 열어주세요.</li>";
+ $("installGuide").hidden=false;
+};
+$("installClose").onclick=()=>$("installGuide").hidden=true;
+$("installGuide").onclick=e=>{if(e.target===$("installGuide"))$("installGuide").hidden=true};
 
 if("serviceWorker" in navigator&&location.protocol.startsWith("http")){
  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));
